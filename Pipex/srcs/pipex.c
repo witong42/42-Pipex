@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 11:26:07 by witong            #+#    #+#             */
-/*   Updated: 2024/10/26 15:03:56 by witong           ###   ########.fr       */
+/*   Updated: 2024/10/26 16:14:24 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,21 +35,40 @@ waitpid
 
 #include "pipex.h"
 
-void	open_file(int *fd, char **av, int mode)
+void	open_file(int *fd, int ac, char **av, int mode)
 {
-
+	if (mode == 1)
+	{
+		fd[1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (fd[1] < 0)
+			print_error("Error opening outfile\n");
+	}
+	else
+	{
+		fd[0] = open(av[1], O_RDONLY);
+		if (fd[0] < 0)
+			print_error("Error opening infile\n");
+		fd[1] = open(av[1], O_WRONLY | O_TRUNC | O_CREAT, 0644);
+		if (fd[1] < 0)
+			print_error("Error opening outfile\n");
+	}
+}
+void	close_file(int *fd, pid_t pid)
+{
+		waitpid(pid, NULL, 0);
+		dup2(fd[0], STDIN_FILENO);
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		execute(ac, av, env);
 }
 
-void	execute(int fd, char **av, char **env, bool mode)
-{
-	dup2(fd, STDOUT_FILENO);
-	close(fd);
+
 	if (mode == 1)
 		execve(av[3], &av[3], env);
 	else
 		execve(av[2], &av[2], env);
-	print_error("Error executing command");
-}
+
 
 void	here_doc(char *limiter, char **av)
 {
@@ -69,21 +88,15 @@ int	main(int ac, char **av, char **env)
     if (ac < 5 || (mode == 1 && ac < 6))
 		print_error("Usage: ./pipex <file1> <cmd1> <cmd2> <file2>\n\
 			OR ./pipex here_doc <LIMITER> <cmd> <cmd1> <file>");
-	open_file(fd, av, mode);
+	open_file(fd, ac, av, mode);
 	if (pipe(fd) < 0)
 		print_error("Error creating pipe\n");
 	pid = fork();
 	if (pid < 0)
 		print_error("Error forking process\n");
 	if (pid == 0)
-	{
 		if (mode == 1)
-			here_doc(av[2]);
-		execute(fd, av, env, mode);
-	}
-	waitpid(pid, NULL, 0);
-	close(fd[0])
-	close(fd[1])
+//			here_doc(av[2]);
 	return (0);
 }
 
