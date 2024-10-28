@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 14:23:43 by witong            #+#    #+#             */
-/*   Updated: 2024/10/28 08:42:50 by witong           ###   ########.fr       */
+/*   Updated: 2024/10/28 10:34:11 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	print_error(char *str)
 	ft_putstr_fd(str, 2);
 	exit(EXIT_FAILURE);
 }
-
+/*
 int	here_doc_mode(char *limiter)
 {
 	int	pipefd[2];
@@ -39,4 +39,4 @@ int	here_doc_mode(char *limiter)
 	close(pipefd[1]);
 	return (pipefd[0]);
 }
-
+*/

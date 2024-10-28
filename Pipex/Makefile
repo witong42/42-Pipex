@@ -1,13 +1,13 @@
-NAME = pipex
+NAME	= pipex
 
-SRCS =
+SRCS	= /srcs/pipex.c srcs/utils.c
 
-OBJS =
+OBJS	=	$(SRCS%.o=%.c)
 
-CC = gcc
+CC		= gcc
 
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS	= -Wall -Werror -Wextra
 
-
+RM		= rm -f
 
 

@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/10/27 18:32:20 by witong           ###   ########.fr       */
+/*   Updated: 2024/10/28 15:16:00 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,15 @@
 
 typedef struct s_pipex_params
 {
+	int		input_fd;
+	int		output_fd;
+	char	**cmds;
+	char	**env;
+	char	**path;
 	char	*infile;
 	char	*outfile;
-	char	**cmds;
-	int		nb_cmds;
-	bool	mode;
-	char	**envp;
+//	int		nb_cmds;
+//	bool	mode;
 }		t_pipex_params;
 
 // utils.c
