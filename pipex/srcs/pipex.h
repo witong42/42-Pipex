@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/10/28 15:16:00 by witong           ###   ########.fr       */
+/*   Updated: 2024/10/29 14:57:59 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,6 @@ typedef struct s_pipex_params
 
 // utils.c
 void	print_error(char *str);
+void	free_params(t_pipex_params *params);
 
 #endif

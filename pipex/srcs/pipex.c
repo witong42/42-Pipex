@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 10:22:07 by witong            #+#    #+#             */
-/*   Updated: 2024/10/29 14:23:30 by witong           ###   ########.fr       */
+/*   Updated: 2024/10/29 15:04:20 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,9 @@ void	execute(t_pipex_params *params, int current)
 	free(full_path);
 	i++;
 	}
+	close(params->input_fd);
+	close(params->output_fd);
 	execve(full_path,cmd,params->env);
-	//TODO free and error
 }
 void child(t_pipex_params *params, int *fd, int is_first)
 {
@@ -103,6 +104,7 @@ void child(t_pipex_params *params, int *fd, int is_first)
 		close(fd[1]);
 		execute(params, 1);
 	}
+	free_params(params);
 	exit(0);
 }
 
