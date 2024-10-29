@@ -6,13 +6,13 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 10:22:07 by witong            #+#    #+#             */
-/*   Updated: 2024/10/28 15:25:51 by witong           ###   ########.fr       */
+/*   Updated: 2024/10/29 14:23:30 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-t_pipex_params	init_params(int ac, char **av, char **env)
+t_pipex_params	init_params(char **av, char **env)
 {
 	t_pipex_params params;
 	params.infile = av[1];
@@ -24,14 +24,14 @@ t_pipex_params	init_params(int ac, char **av, char **env)
 }
 void	open_files(t_pipex_params *params)
 {
-	params->input_fd = open(params->infile, O_RDONLY);
+	params->input_fd = open(params->infile, O_RDONLY, 0644);
 	if (params->input_fd < 0)
-		print_error("Error opening infile");
-	params->output_fd = open(params->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+		print_error("Error opening infile\n");
+	params->output_fd = open(params->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (params->output_fd < 0)
 	{
 		close(params->output_fd);
-		print_error("Error opening outfile");
+		print_error("Error opening outfile\n");
 	}
 }
 void	find_path(t_pipex_params *params)
@@ -48,12 +48,14 @@ void	find_path(t_pipex_params *params)
 			if (path)
 			{
 				params->path = ft_split(path + 5, ':');
-				break ;
+				if (params->path == NULL)
+					print_error("Error splitting PATH\n");
+				return ;
 			}
-			print_error("Error find path failure");
 		}
 		i++;
 	}
+	print_error("Error find path failure\n");
 }
 void	execute(t_pipex_params *params, int current)
 {
@@ -112,7 +114,7 @@ int main(int ac, char **av, char **env)
 
 	if (ac == 5)
 	{
-		params = init_params(ac, av, env);
+		params = init_params(av, env);
 		open_files(&params);
 		find_path(&params);
 		if (pipe(fd) == -1)
