@@ -1,102 +1,135 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipex.c1.bak                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/27 17:43:18 by witong            #+#    #+#             */
-/*   Updated: 2024/10/28 10:20:21 by witong           ###   ########.fr       */
+/*   Created: 2024/10/28 10:22:07 by witong            #+#    #+#             */
+/*   Updated: 2024/11/08 15:25:17 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
-typedef struct s_pipex_params
-{
-	char	*infile;
-	char	*outfile;
-	char	**cmds;
-	int		nb_cmds;
-	bool	mode;
-	char	**envp;
-	int		input_fd;
-	int		output_fd;
-} t_pipex_params;
-*/
-
 #include "pipex.h"
 
-bool	get_mode(int ac, char **av)
+t_pipex_params	init_params(char **av, char **env)
 {
-	if (ac < 5 || (strncmp(av[1], "here_doc", 8) == 0 && ac < 6))
-	{
-		print_error("Usage: ./pipex <file1> <cmd1> <cmd2> <file2>\n\
-			OR ./pipex here_doc <LIMITER> <cmd> <cmd1> <file>");
-		return (false);
-	}
-	return (strncmp(av[1], "here_doc", 8) == 0);
+	t_pipex_params params;
+	params.infile = av[1];
+	params.outfile = av[4];
+	params.cmds = &av[2];
+//	params.nb_cmds = 2;
+	params.env = env;
+	return (params);
 }
-
 void	open_files(t_pipex_params *params)
 {
-	if (params->mode)
+	params->input_fd = open(params->infile, O_RDONLY, 0644);
+	if (params->input_fd < 0)
+		print_error("Error opening infile\n");
+	params->output_fd = open(params->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (params->output_fd < 0)
 	{
-		params.input_fd = here_doc(params.cmds[-1]);
-		params.output_fd = open(params->outfile,
-				O_WRONLY | O_CREAT | O_APPEND, 0644);
+		close(params->output_fd);
+		print_error("Error opening outfile\n");
+	}
+}
+void	find_path(t_pipex_params *params)
+{
+	char	*path;
+	int		i;
+
+	i = 0;
+	while (params->env[i])
+	{
+		if (params->env[i][0] == 'P')
+		{
+			path = ft_strnstr(params->env[i], "PATH=", 5);
+			if (path)
+			{
+				params->path = ft_split(path + 5, ':');
+				if (params->path == NULL)
+					print_error("Error splitting PATH\n");
+				return ;
+			}
+		}
+		i++;
+	}
+	print_error("Error find path failure\n");
+}
+void	execute(t_pipex_params *params, int current)
+{
+	char	**cmd;
+	char	*path;
+	char	*full_path;
+	int		i;
+
+	cmd = ft_split(params->cmds[current], ' ');
+	if(!cmd || !cmd[0])
+		print_error("Error malloc split");
+	i = 0;
+	while (params->path[i])
+	{
+	path = ft_strjoin(params->path[i], "/");
+	full_path = ft_strjoin(path, cmd[0]);
+	free(path);
+	if (access(full_path, X_OK) == 0)
+		break;
+	free(full_path);
+	i++;
+	}
+	close(params->input_fd);
+	close(params->output_fd);
+	execve(full_path,cmd,params->env);
+}
+void child(t_pipex_params *params, int *fd, int is_first)
+{
+	if (is_first)
+	{
+		if (dup2(fd[1], 1) == -1)
+			print_error("Error dup2 failure");
+		if (dup2(params->input_fd, 0) == -1)
+			print_error("Error dup2 failure");
+		close(fd[0]);
+		close(fd[1]);
+		execute(params, 0);
 	}
 	else
 	{
-		params.input_fd = open(params->infile, O_RDONLY);
-		if (input_fd < 0)
-			print_error("Error opening input file");
-		params.output_fd = open(params->outfile,
-				O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (dup2(params->output_fd, 1) == -1)
+			print_error("Error dup2 failure");
+		if (dup2(fd[0], 0) == -1)
+			print_error("Error dup2 failure");
+		close(fd[0]);
+		close(fd[1]);
+		execute(params, 1);
 	}
-	if (params.output_fd < 0)
-		print_error("Error opening output file");
+	free_params(params);
+	exit(0);
 }
-/*
-pipex()
-{
-pipe()
- |
- |-- fork()char
-      |
-      |-- child // cmd1
-      :     |--dup2()
-      :     |--close end[0]
-      :     |--execve(cmd1)
-      :
-      |-- parent // cmd2
-            |--dup2()
-            |--close end[1]
-            |--execve(cmd2)
-}
-*/
 
-int	main(int ac, char **av, char **envp)
+int main(int ac, char **av, char **env)
 {
-	t_pipex_params	params;
+	t_pipex_params params;
+	int fd[2];
+	pid_t pid;
 
-	params.mode = get_mode(ac, av);
-	if (params.mode)
+	if (ac == 5)
 	{
-		params.infile = NULL;
-		params.outfile = av[ac - 1];
-		params.nb_cmds = ac - 4;
-		params.cmds = &av[3];
+		params = init_params(av, env);
+		open_files(&params);
+		find_path(&params);
+		if (pipe(fd) == -1)
+			print_error("Error pipe failure\n");
+		pid = fork();
+		if (pid == -1)
+			print_error("Error fork failure\n");
+		if (pid == 0)
+			child(&params, fd, 1);
+		waitpid(pid, NULL, 0);
+		child(&params, fd, 0);
+		close(fd[0]);
+		close(fd[1]);
+		waitpid(0, NULL, 0);
 	}
-	else
-	{
-		params.infile = av[1];
-		params.outfile = av[4];
-		params.nb_cmds = 2;
-		params.cmds = &av[2];
-	}
-	params.envp = envp;
-	open_files(&params);
-	pipex();
-	execute();
-	return (0);
 }
