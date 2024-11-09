@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/10/29 14:57:59 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/09 19:56:28 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,22 @@
 # include "../libft/inc/ft_printf.h"
 # include "../libft/inc/get_next_line.h"
 
-typedef struct s_pipex_params
+typedef struct s_pipex
 {
-	int		input_fd;
-	int		output_fd;
-	char	**cmds;
+	int		infile;
+	int		outfile;
+	int		fd[2];
+	int		pid1;
+	int		pid2;
+	char	**cmd_args;
+	char	**cmd_paths;
+	char	*cmd;
 	char	**env;
-	char	**path;
-	char	*infile;
-	char	*outfile;
-//	int		nb_cmds;
-//	bool	mode;
-}		t_pipex_params;
+}		t_pipex;
 
 // utils.c
 void	print_error(char *str);
-void	free_params(t_pipex_params *params);
+void	print_perror(char *str);
+void	free_params(t_pipex *params);
 
 #endif

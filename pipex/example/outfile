@@ -1,7 +1,8 @@
-a.out$
-example$
-libft$
-Makefile$
-outfile$
-pipex$
-srcs$
+total 28$
+-rw-r--r-- 1 witong 2024_paris   403 Nov  9 18:29 1$
+drwxr-xr-x 2 witong 2024_paris    52 Nov  9 18:31 example$
+drwxr-xr-x 4 witong 2024_paris    60 Nov  9 10:37 libft$
+-rw-r--r-- 1 witong 2024_paris   485 Nov  9 10:37 Makefile$
+-rw-r--r-- 1 witong 2024_paris     0 Nov  9 10:37 outfile$
+-rwxr-xr-x 1 witong 2024_paris 17400 Nov  9 18:48 pipex$
+drwxr-xr-x 2 witong 2024_paris   185 Nov  9 18:48 srcs$

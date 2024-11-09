@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 14:23:43 by witong            #+#    #+#             */
-/*   Updated: 2024/11/09 09:29:41 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/09 17:43:49 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,34 +18,30 @@ void	print_error(char *str)
 	exit(EXIT_FAILURE);
 }
 
-void free_params(t_pipex_params *params)
+void	print_perror(char *str)
+{
+	perror(str);
+	exit(EXIT_FAILURE);
+}
+
+void free_params(t_pipex *params)
 {
 	int	i;
 
 	i = 0;
+	if (params)
 	{
-		while (params->cmds[i])
+		if (params->infile >= 0)
+			close(params->infile);
+		if (params->outfile >= 0)
+			close(params->outfile);
+		if (params->paths)
 		{
-			free(params->cmds[i]);
-			i++;
-		}
-		free(params->cmds);
-	}
-	i = 0;
-	if (params->env)
-	{
-		while (params->env[i++])
-			free(params->env[i]);
-		free(params->env);
-	}
+            while (params->paths[i])
+                free(params->paths[i++]);
+            free(params->paths);
+        }
+        free(params);
+    }
 }
 
-char *find_path(char **envp)
-{
-	while (*envp && ft_strncmp("PATH=", *envp, 5) != 0)
-		envp++;
-	if (*envp)
-		return *envp + 5;
-	else
-		return NULL;
-}
