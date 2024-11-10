@@ -1,6 +1,6 @@
 NAME	= pipex
 
-SRCS	= srcs/pipex.c srcs/utils.c
+SRCS	= srcs/pipex.c srcs/utils.c srcs/getpath.c
 OBJS	= $(SRCS:%.c=%.o)
 
 CC		= gcc

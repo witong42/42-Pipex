@@ -1,122 +1,98 @@
+/* ************************************************************************** */
+/*																			*/
+/*														:::	  ::::::::   */
+/*   pipex.c											:+:	  :+:	:+:   */
+/*													+:+ +:+		 +:+	 */
+/*   By: witong <witong@student.42.fr>			  +#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2024/11/10 08:47:51 by witong			#+#	#+#			 */
+/*   Updated: 2024/11/10 09:12:32 by witong		   ###   ########.fr	   */
+/*																			*/
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-void	get_cmds(t_pipex *params, char *cmd)
+void first_child(t_pipex *px)
 {
-	char *path;
-	char *full_path;
-
-	while (*params->paths)
-	{
-		path = ft_strjoin(*params->paths, "/");
-		full_path = ft_strjoin(path, cmd);
-		free(path);
-		if (access(full_path, 0) == 0)
-		{
-			params->full_path = full_path;
-			return ;
-		}
-		free(full_path);
-		params->paths++;
-	}
-	print_perror("Command not found");
-}
-
-void first_child(t_pipex *params, int *fd)
-{
-	if (dup2(fd[1], 1) == -1)
-		print_error("Error dup2 failure");
-	close(fd[1]);
-	if (dup2(params->infile, 0) == -1)
-		print_error("Error dup2 failure");
-	close(fd[0]);
-	params->cmd_args = ft_split([0], ' ');
-	get_cmds(params, params->cmd[0]);
-	execve(params->full_path, params->cmd, params->env);
-	print_perror("Error execve\n");
-}
-void second_child(t_pipex *params, int *fd)
-{
-	if (dup2(params->outfile, 1) == -1)
-		print_error("Error dup2 failure");
-	close(fd[1]);
-	if (dup2(fd[0], 0) == -1)
-		print_error("Error dup2 failure");
-	close(fd[0]);
-	params->cmd = ft_split(av[3], ' ');
-	if (!params->cmd)
+	if (dup2(px->fd[1], 1) == -1)
+		print_error("Error dup2 failed");
+	close(px->fd[1]);
+	if (dup2(px->infile, 0) == -1)
+		print_error("Error dup2 failed");
+	close(px->fd[0]);
+	px->cmd = ft_split(px->cmd_args[0], ' ');
+	if (!px->cmd)
 		print_error("Error split failed.\n");
-	get_cmds(params, params->cmd[1]);
-	execve(params->full_path, params->cmd, params->env);
-	print_perror("Error execve\n");
-}
-void	find_path(t_pipex *params)
-{
-	char **env;
-
-	env = params->env;
-	while (*env && ft_strncmp("PATH=", *env, 5) != 0)
-		env++;
-	if (!*env)
-		print_error("Error finding PATH variable\n");
-	params->paths = ft_split(*env + 5, ':');
-	if (!params->paths)
-		print_error("Error splitting PATH\n");
+	get_cmds(px);
+	execve(px->full_path, px->cmd, px->env);
+	child_free(px);
+	print_perror("Error execve failed\n");
 }
 
-void	pipex(t_pipex *params)
+void second_child(t_pipex *px)
 {
-	int	fd[2];
-	pid_t child1;
-	pid_t child2;
-
-	if (pipe(fd) == -1)
-		print_perror("Error Pipe.\n");
-	child1 = fork();
-	if (child1 == -1)
-		print_error("Error Fork.\n");
-	if (child1 == 0)
-		first_child(params, fd);
-	child2 = fork();
-	if (child2 == -1)
-		print_error("Error Fork.\n");
-	if (child2 == 0)
-		second_child(params, fd);
-	close(fd[0]);
-	close(fd[1]);
-	waitpid(child1, NULL, 0);
-	waitpid(child2, NULL, 0);
+	if (dup2(px->outfile, 1) == -1)
+		print_error("Error dup2 failed");
+	close(px->fd[1]);
+	if (dup2(px->fd[0], 0) == -1)
+		print_error("Error dup2 failed");
+	close(px->fd[0]);
+	px->cmd = ft_split(px->cmd_args[1], ' ');
+	if (!px->cmd)
+		print_error("Error split failed.\n");
+	get_cmds(px);
+	execve(px->full_path, px->cmd, px->env);
+	child_free(px);
+	print_perror("Error execve failed\n");
 }
 
-t_pipex	*init(char **av, char **env)
-{
-	t_pipex *params;
 
-	params = malloc(sizeof(t_pipex));
-	if (!params)
-		print_error("Memory allocation failed\n");
-	params->env = env;
-	params->cmd = &av[2];
-	params->infile = open(av[1], O_RDONLY);
-	if (params->infile < 0)
-		print_perror("Error Infile.\n");
-	params->outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (params->outfile < 0)
+static void	pipex(t_pipex *px, char **av, char **env)
+{
+	px->infile = open(av[1], O_RDONLY);
+	px->outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (px->infile == -1 || px->outfile == -1)
+		print_perror("Error opening files\n");
+	px->cmd_args = &av[2];
+	px->env = env;
+	if (pipe(px->fd) == -1)
 	{
-		close(params->infile);
-		print_perror("Error Outfile.\n");
+		free(px);
+		print_perror("Error pipe\n");
 	}
-	find_path(params);
-	return (params);
+}
+
+static void	fork_children(t_pipex *px)
+{
+	px->pid1 = fork();
+	if (px->pid1 == -1)
+		print_perror("Error fork failed\n");
+	if (px->pid1 == 0)
+		first_child(px);
+	px->pid2 = fork();
+	if (px->pid2 == -1)
+		print_perror("Error fork failed\n");
+	if (px->pid2 == 0)
+		second_child(px);
+	close(px->fd[0]);
+	close(px->fd[1]);
+	waitpid(px->pid1, NULL, 0);
+	waitpid(px->pid2, NULL, 0);
+	parent_free(px);
 }
 
 int main(int ac, char **av, char **env)
 {
-	t_pipex	*params;
+	t_pipex *px;
 
 	if (ac != 5)
 		print_perror("Invalid number of arguments.\n");
-	params = init(av, env);
-	pipex(params);
-	free_params(params);
-	return (0);
+	px = malloc(sizeof(t_pipex));
+	if (!px)
+		print_error("Error memory allocation\n");
+	init_pipex(px);
+	pipex(px, av, env);
+	fork_children(px);
+	parent_free(px);
+	return (EXIT_SUCCESS);
 }

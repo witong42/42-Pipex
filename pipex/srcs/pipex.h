@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/11/09 19:56:28 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/10 11:27:31 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,22 @@ typedef struct s_pipex
 	int		fd[2];
 	int		pid1;
 	int		pid2;
-	char	**cmd_args;
 	char	**cmd_paths;
-	char	*cmd;
+	char	**cmd_args;
+	char	**cmd;
+	char	*full_path;
 	char	**env;
 }		t_pipex;
 
 // utils.c
 void	print_error(char *str);
 void	print_perror(char *str);
-void	free_params(t_pipex *params);
+void	init_pipex(t_pipex *px);
+void	parent_free(t_pipex *px);
+void	child_free(t_pipex *px);
+
+// getpath.c
+void	find_path(t_pipex *px);
+void	get_cmds(t_pipex *px);
 
 #endif
