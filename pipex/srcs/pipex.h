@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/11/10 11:27:31 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/10 11:55:36 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,6 @@ typedef struct s_pipex
 {
 	int		infile;
 	int		outfile;
-	int		fd[2];
-	int		pid1;
-	int		pid2;
 	char	**cmd_paths;
 	char	**cmd_args;
 	char	**cmd;

@@ -27,10 +27,6 @@ void init_pipex(t_pipex *px)
 {
     px->infile = -1;
     px->outfile = -1;
-    px->fd[0] = -1;
-    px->fd[1] = -1;
-    px->pid1 = -1;
-    px->pid2 = -1;
     px->cmd_paths = NULL;
     px->cmd_args = NULL;
     px->cmd = NULL;

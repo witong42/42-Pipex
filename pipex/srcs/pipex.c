@@ -12,37 +12,35 @@
 
 #include "pipex.h"
 
-void first_child(t_pipex *px)
+void first_child(t_pipex *px, int pipe_fd[2])
 {
-	if (dup2(px->fd[1], 1) == -1)
+	if (dup2(pipe_fd[1], 1) == -1)
 		print_error("Error dup2 failed");
-	close(px->fd[1]);
+	close(pipe_fd[1]);
 	if (dup2(px->infile, 0) == -1)
 		print_error("Error dup2 failed");
-	close(px->fd[0]);
+	close(pipe_fd[0]);
 	px->cmd = ft_split(px->cmd_args[0], ' ');
 	if (!px->cmd)
 		print_error("Error split failed.\n");
 	get_cmds(px);
 	execve(px->full_path, px->cmd, px->env);
-	child_free(px);
 	print_perror("Error execve failed\n");
 }
 
-void second_child(t_pipex *px)
+void second_child(t_pipex *px, int pipe_fd[2])
 {
 	if (dup2(px->outfile, 1) == -1)
 		print_error("Error dup2 failed");
-	close(px->fd[1]);
-	if (dup2(px->fd[0], 0) == -1)
+	close(pipe_fd[1]);
+	if (dup2(pipe_fd[0], 0) == -1)
 		print_error("Error dup2 failed");
-	close(px->fd[0]);
+	close(pipe_fd[0]);
 	px->cmd = ft_split(px->cmd_args[1], ' ');
 	if (!px->cmd)
 		print_error("Error split failed.\n");
 	get_cmds(px);
 	execve(px->full_path, px->cmd, px->env);
-	child_free(px);
 	print_perror("Error execve failed\n");
 }
 
@@ -55,29 +53,30 @@ static void	pipex(t_pipex *px, char **av, char **env)
 		print_perror("Error opening files\n");
 	px->cmd_args = &av[2];
 	px->env = env;
-	if (pipe(px->fd) == -1)
-	{
-		free(px);
-		print_perror("Error pipe\n");
-	}
 }
 
 static void	fork_children(t_pipex *px)
 {
-	px->pid1 = fork();
-	if (px->pid1 == -1)
+	pid_t	pid1;
+	pid_t	pid2;
+	int		pipe_fd[2];
+
+	if (pipe(pipe_fd) == -1)
+		print_perror("Error pipe failed\n");
+	pid1 = fork();
+	if (pid1 == -1)
 		print_perror("Error fork failed\n");
-	if (px->pid1 == 0)
-		first_child(px);
-	px->pid2 = fork();
-	if (px->pid2 == -1)
+	if (pid1 == 0)
+		first_child(px, pipe_fd);
+	pid2 = fork();
+	if (pid2 == -1)
 		print_perror("Error fork failed\n");
-	if (px->pid2 == 0)
-		second_child(px);
-	close(px->fd[0]);
-	close(px->fd[1]);
-	waitpid(px->pid1, NULL, 0);
-	waitpid(px->pid2, NULL, 0);
+	if (pid2 == 0)
+		second_child(px, pipe_fd);
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
+	waitpid(pid1, NULL, 0);
+	waitpid(pid2, NULL, 0);
 	parent_free(px);
 }
 
@@ -93,6 +92,5 @@ int main(int ac, char **av, char **env)
 	init_pipex(px);
 	pipex(px, av, env);
 	fork_children(px);
-	parent_free(px);
 	return (EXIT_SUCCESS);
 }
