@@ -1,7 +1,12 @@
-total 28$
-drwxr-xr-x 2 witong 2024_paris    35 Nov 10 11:50 example$
-drwxr-xr-x 4 witong 2024_paris    60 Nov  9 10:37 libft$
--rw-r--r-- 1 witong 2024_paris   500 Nov 10 11:50 Makefile$
--rw-r--r-- 1 witong 2024_paris     0 Nov  9 10:37 outfile$
--rwxr-xr-x 1 witong 2024_paris 21640 Nov 10 12:13 pipex$
-drwxr-xr-x 2 witong 2024_paris   115 Nov 10 12:13 srcs$
+Finding PATH in environment variables...
+PATH found: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+Getting commands for: helloo
+Checking path: /usr/local/sbin/helloo
+Checking path: /usr/local/bin/helloo
+Checking path: /usr/sbin/helloo
+Checking path: /usr/bin/helloo
+Checking path: /sbin/helloo
+Checking path: /bin/helloo
+Checking path: /usr/games/helloo
+Checking path: /usr/local/games/helloo
+Checking path: /snap/bin/helloo
