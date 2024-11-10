@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/11/10 15:06:18 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/10 15:27:43 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_pipex
 void	print_error(char *str);
 
 // getpath.c
-char **find_path(t_pipex *ppx, char **env, char *cmd);
-void	get_cmds(t_pipex *ppx, char **env, char *cmd);
+char **find_path(char **env);
+void get_cmds(t_pipex *ppx, char **env);
+
 #endif

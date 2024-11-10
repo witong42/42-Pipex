@@ -1,12 +1,9 @@
-Finding PATH in environment variables...
-PATH found: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-Getting commands for: helloo
-Checking path: /usr/local/sbin/helloo
-Checking path: /usr/local/bin/helloo
-Checking path: /usr/sbin/helloo
-Checking path: /usr/bin/helloo
-Checking path: /sbin/helloo
-Checking path: /bin/helloo
-Checking path: /usr/games/helloo
-Checking path: /usr/local/games/helloo
-Checking path: /snap/bin/helloo
+.$
+..$
+.DS_Store$
+Makefile$
+example$
+libft$
+pipex$
+srcs$
+srcs1$

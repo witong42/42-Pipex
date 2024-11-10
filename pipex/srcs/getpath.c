@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 14:48:19 by witong            #+#    #+#             */
-/*   Updated: 2024/11/10 15:18:28 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/10 15:27:10 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,26 +25,23 @@ void free_cmd_paths(char **cmd_paths)
 	free(cmd_paths);
 }
 
-char **find_path(t_pipex *ppx, char **env, char *cmd)
+char **find_path(char **env)
 {
 	while (*env && ft_strncmp("PATH=", *env, 5) != 0)
 		env++;
 	if (!*env)
 		print_error("Error finding PATH variable\n");
-	ppx->cmd = ft_split(cmd, ' ');
-	if (!ppx->cmd || !ppx->cmd[0])
-		print_error("Error splitting command\n");
 	return (ft_split(*env + 5, ':'));
 }
 
-void get_cmds(t_pipex *ppx, char **env, char *cmd)
+void get_cmds(t_pipex *ppx, char **env)
 {
 	char **paths;
 	char *path;
 	char *full_path;
 	int i;
 
-	paths = find_path(ppx, env, cmd);
+	paths = find_path(env);
 	i = 0;
 	while (paths[i])
 	{

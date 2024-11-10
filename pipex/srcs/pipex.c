@@ -20,7 +20,10 @@ void child_process(t_pipex *ppx, char **av, char **env)
 	close(ppx->fd[1]);
 	close(ppx->infile);
 	close(ppx->outfile);
-	get_cmds(ppx, env, av[2]);
+	ppx->cmd = ft_split(av[2], ' ');
+	if (!ppx->cmd || !ppx->cmd[0])
+		print_error("Error splitting command\n");
+	get_cmds(ppx, env);
 	execve(ppx->full_path, ppx->cmd, env);
 	print_error("Error executing command");
 }
@@ -34,7 +37,10 @@ void parent_process(t_pipex *ppx, char **av, char **env)
 	close(ppx->fd[1]);
 	close(ppx->infile);
 	close(ppx->outfile);
-	get_cmds(ppx, env, av[3]);
+	ppx->cmd = ft_split(av[3], ' ');
+	if (!ppx->cmd || !ppx->cmd[0])
+		print_error("Error splitting command\n");
+	get_cmds(ppx, env);
 	execve(ppx->full_path, ppx->cmd, env);
 	print_error("Error executing command");
 }
