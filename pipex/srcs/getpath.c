@@ -6,23 +6,11 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 21:02:25 by witong            #+#    #+#             */
-/*   Updated: 2024/11/10 21:16:28 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/11 12:19:06 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-void free_paths(char **paths)
-{
-	int i = 0;
-
-	while (paths[i])
-	{
-		free(paths[i]);
-		i++;
-	}
-	free(paths);
-}
 
 static char **find_path(char **env)
 {
@@ -63,9 +51,15 @@ void get_cmds(t_pipex *ppx, char **env)
 
 	paths = find_path(env);
 	if (!paths)
+	{
+		free_all(ppx);
 		print_error("Error finding PATH variable\n");
+	}
 	ppx->full_path = find_fullpath(paths, ppx->cmd[0]);
 	free_paths(paths);
 	if (!ppx->full_path)
+	{
+		free_all(ppx);
 		print_error("Command not found\n");
+	}
 }

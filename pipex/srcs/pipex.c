@@ -6,44 +6,50 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 21:19:16 by witong            #+#    #+#             */
-/*   Updated: 2024/11/10 21:19:17 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/11 14:30:35 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #include "pipex.h"
 
 void child_process(t_pipex *ppx, char **av, char **env)
 {
-	dup2(ppx->infile, 0);
-	dup2(ppx->fd[1], 1);
+	dup2(ppx->infile, STDIN_FILENO);
+	dup2(ppx->fd[1], STDOUT_FILENO);
 	close(ppx->fd[0]);
 	close(ppx->fd[1]);
 	close(ppx->infile);
 	close(ppx->outfile);
 	ppx->cmd = ft_split(av[2], ' ');
 	if (!ppx->cmd || !ppx->cmd[0])
+	{
+		free_all(ppx);
 		print_error("Error splitting command\n");
+	}
 	get_cmds(ppx, env);
 	execve(ppx->full_path, ppx->cmd, env);
+	free_all(ppx);
 	print_error("Error executing command");
 }
 
 void parent_process(t_pipex *ppx, char **av, char **env)
 {
 	waitpid(ppx->pid, NULL, 0);
-	dup2(ppx->fd[0], 0);
-	dup2(ppx->outfile, 1);
+	dup2(ppx->fd[0], STDIN_FILENO);
+	dup2(ppx->outfile, STDOUT_FILENO);
 	close(ppx->fd[0]);
 	close(ppx->fd[1]);
 	close(ppx->infile);
 	close(ppx->outfile);
 	ppx->cmd = ft_split(av[3], ' ');
 	if (!ppx->cmd || !ppx->cmd[0])
+	{
+		free_all(ppx);
 		print_error("Error splitting command\n");
+	}
 	get_cmds(ppx, env);
 	execve(ppx->full_path, ppx->cmd, env);
+	free_all(ppx);
 	print_error("Error executing command");
 }
 
@@ -52,20 +58,23 @@ void pipex(t_pipex *ppx, char **av, char **env)
 	ppx->infile = open(av[1], O_RDONLY);
 	ppx->outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (ppx->infile < 0 || ppx->outfile < 0)
-		print_error("Error opening files");
+		print_error("Error open files");
 	if (pipe(ppx->fd) == -1)
-		print_error("Error creating pipe");
+	{
+		free_all(ppx);
+		print_error("Error pipe");
+	}
 	ppx->pid = fork();
 	if (ppx->pid == -1)
-		print_error("Error during fork");
+	{
+		free_all(ppx);
+		print_error("Error fork");
+	}
 	if (ppx->pid == 0)
 		child_process(ppx, av, env);
 	else
 		parent_process(ppx, av, env);
-	close(ppx->fd[0]);
-	close(ppx->fd[1]);
-	close(ppx->infile);
-	close(ppx->outfile);
+	free_all(ppx);
 }
 
 int main(int ac, char **av, char **env)
@@ -74,6 +83,8 @@ int main(int ac, char **av, char **env)
 
 	if (ac != 5)
 		print_error("Usage: ./pipex infile cmd1 cmd2 outfile");
+	init_ppx(&ppx);
 	pipex(&ppx, av, env);
+	free_all(&ppx);
 	return (0);
 }
