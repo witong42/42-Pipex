@@ -1,7 +1,0 @@
-total 36$
--rw-r--r-- 1 witong42 witong42   500 Nov 10 13:30 Makefile$
-drwxr-xr-x 1 witong42 witong42   128 Nov 10 13:30 example$
-drwxr-xr-x 1 witong42 witong42   192 Nov 10 20:10 libft$
--rwxrwxr-x 1 witong42 witong42 14864 Nov 10 20:57 pipex$
-drwxr-xr-x 1 witong42 witong42   288 Nov 10 20:57 srcs$
-drwxr-xr-x 1 witong42 witong42   128 Nov 10 14:38 srcs1$

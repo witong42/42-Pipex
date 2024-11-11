@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/11/11 14:30:45 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/11 15:35:09 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,6 @@ void	free_all(t_pipex *ppx);
 void	free_paths(char **paths);
 
 // getpath.c
-void get_cmds(t_pipex *ppx, char **env);
+void	get_cmds(t_pipex *ppx, char **env);
 
 #endif

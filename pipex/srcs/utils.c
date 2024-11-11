@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 21:19:28 by witong            #+#    #+#             */
-/*   Updated: 2024/11/11 14:29:41 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/11 15:34:51 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	free_all(t_pipex *ppx)
 	if (ppx->full_path)
 		free(ppx->full_path);
 }
+
 void	free_paths(char **paths)
 {
 	int	i;

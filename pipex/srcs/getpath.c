@@ -6,26 +6,26 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 21:02:25 by witong            #+#    #+#             */
-/*   Updated: 2024/11/11 12:19:06 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/11 15:33:42 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static char **find_path(char **env)
+static char	**find_path(char **env)
 {
 	while (*env && ft_strncmp("PATH=", *env, 5) != 0)
 		env++;
 	if (!*env)
-		print_error("Error finding PATH variable\n");
+		print_error("Error finding path in env.\n");
 	return (ft_split(*env + 5, ':'));
 }
 
-static char *find_fullpath(char **paths, char *cmd)
+static char	*find_fullpath(char **paths, char *cmd)
 {
-	int i;
-	char *path;
-	char *full_path;
+	int		i;
+	char	*path;
+	char	*full_path;
 
 	i = 0;
 	while (paths[i])
@@ -45,21 +45,21 @@ static char *find_fullpath(char **paths, char *cmd)
 	return (NULL);
 }
 
-void get_cmds(t_pipex *ppx, char **env)
+void	get_cmds(t_pipex *ppx, char **env)
 {
-	char **paths;
+	char	**paths;
 
 	paths = find_path(env);
 	if (!paths)
 	{
 		free_all(ppx);
-		print_error("Error finding PATH variable\n");
+		print_error("Error finding path in env.\n");
 	}
 	ppx->full_path = find_fullpath(paths, ppx->cmd[0]);
 	free_paths(paths);
 	if (!ppx->full_path)
 	{
 		free_all(ppx);
-		print_error("Command not found\n");
+		print_error("Command not found.\n");
 	}
 }
