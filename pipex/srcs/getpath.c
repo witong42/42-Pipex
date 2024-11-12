@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 21:02:25 by witong            #+#    #+#             */
-/*   Updated: 2024/11/11 15:33:42 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/12 16:00:30 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,6 @@ void	get_cmds(t_pipex *ppx, char **env)
 	if (!ppx->full_path)
 	{
 		free_all(ppx);
-		print_error("Command not found.\n");
+		print_error("Error Command not found.\n");
 	}
 }

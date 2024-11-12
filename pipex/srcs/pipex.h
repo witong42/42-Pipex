@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 10:00:12 by witong            #+#    #+#             */
-/*   Updated: 2024/11/11 15:35:09 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/12 15:20:38 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ typedef struct s_pipex
 	int		infile;
 	int		outfile;
 	int		fd[2];
-	pid_t	pid;
+	pid_t	pid1;
+	pid_t	pid2;
 	char	**cmd;
 	char	*full_path;
 }		t_pipex;
@@ -39,6 +40,7 @@ typedef struct s_pipex
 // utils.c
 void	print_error(char *str);
 void	init_ppx(t_pipex *ppx);
+void	close_fds(t_pipex *ppx);
 void	free_all(t_pipex *ppx);
 void	free_paths(char **paths);
 
