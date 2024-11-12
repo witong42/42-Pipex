@@ -6,7 +6,7 @@
 /*   By: witong <witong@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 21:19:16 by witong            #+#    #+#             */
-/*   Updated: 2024/11/11 16:29:37 by witong           ###   ########.fr       */
+/*   Updated: 2024/11/12 11:37:07 by witong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,12 @@ void	pipex(t_pipex *ppx, char **av, char **env)
 {
 	ppx->infile = open(av[1], O_RDONLY);
 	ppx->outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (ppx->infile < 0 || ppx->outfile < 0)
+	if (ppx->infile < 0)
+		ft_putstr_fd("Error open infile\n", 2);
+	if (ppx->outfile < 0)
 	{
 		free_all(ppx);
-		print_error("Error open files.\n");
+		print_error("Error open outfile.\n");
 	}
 	if (pipe(ppx->fd) == -1)
 	{
